@@ -29,6 +29,20 @@ ascii_caveira = """
 def gerar_codigo():
     return "https://discord.gift/" + "".join(random.choices(caracteres, k=16))
 
+def verificar_codigo(codigo):
+    try:
+        token = codigo.split("/")[-1]
+        url = f"https://discordapp.com/api/v9/entitlements/gift-codes/{token}?with_application=false&with_subscription_plan=true"
+        resposta = requests.get(url)
+        if resposta.status_code == 200:
+            print(f"[VÁLIDO] {codigo}")
+        elif resposta.status_code == 404:
+            print(f"[INVÁLIDO] {codigo}")
+        else:
+            print(f"[??] {codigo} | Código retornou {resposta.status_code}")
+    except Exception as e:
+        print(f"Erro ao verificar {codigo}: {e}")
+
 def gerar_codigos():
     global gerando
     gerando = True
@@ -36,6 +50,7 @@ def gerar_codigos():
         codigo = gerar_codigo()
         codigos.append(codigo)
         print(f"[GERADO] {codigo}")
+        verificar_codigo(codigo)
         time.sleep(0.1)
 
 def iniciar_geracao_com_enter():
@@ -48,28 +63,6 @@ def iniciar_geracao_com_enter():
     print("\nGeração encerrada. Retornando ao menu...")
     time.sleep(1)
 
-def verificar_codigos_reais():
-    print(f"\nVerificando {len(codigos)} códigos na API real do Discord...")
-    achou = False
-    for codigo in codigos:
-        try:
-            token = codigo.split("/")[-1]
-            url = f"https://discordapp.com/api/v9/entitlements/gift-codes/{token}?with_application=false&with_subscription_plan=true"
-            resposta = requests.get(url)
-            if resposta.status_code == 200:
-                print(f"[VÁLIDO] {codigo}")
-                achou = True
-            elif resposta.status_code == 404:
-                print(f"[INVÁLIDO] {codigo}")
-            else:
-                print(f"[??] {codigo} | Código retornou {resposta.status_code}")
-            time.sleep(0.5)
-        except Exception as e:
-            print(f"Erro ao verificar {codigo}: {e}")
-    if not achou:
-        print("Nenhum código válido encontrado.")
-    input("\nPressione Enter para continuar...")
-
 def menu():
     while True:
         os.system("clear")
@@ -79,25 +72,22 @@ def menu():
 ║      KING - TERMINAL NITRO CHECKER       ║
 ╚══════════════════════════════════════════╝
 
-[1] Iniciar Gerador de Nitro
-[2] Verificar Códigos (real)
-[3] Resetar e Recomeçar
-[4] Créditos do Projeto
-[5] Sair
+[1] Iniciar Gerador de Nitro + Checker
+[2] Resetar Códigos
+[3] Créditos do Projeto
+[4] Sair
 """)
         escolha = input("Escolha uma opção: ")
         if escolha == "1":
             iniciar_geracao_com_enter()
         elif escolha == "2":
-            verificar_codigos_reais()
-        elif escolha == "3":
             codigos.clear()
             print("Códigos resetados.")
             time.sleep(1)
-        elif escolha == "4":
+        elif escolha == "3":
             print("Criado por KING - Scanner Nitro Hacker Style.")
             input("Pressione Enter para continuar...")
-        elif escolha == "5":
+        elif escolha == "4":
             print("Encerrando...")
             break
         else:
